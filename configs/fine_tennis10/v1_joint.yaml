@@ -1,0 +1,147 @@
+seed: 1
+num_worker: 2
+work_dir: work_dirs/fine_tennis10/v1_joint
+visual_dir: work_dirs/fine_tennis10/v1_joint/visualizations
+phase: train
+train_use_sampler: true
+class_weight_beta: 0.999
+feeder: feeders.fine_tennis10_v1.Feeder
+train_feeder_args:
+  data_path: ./data/Fine-Tennis10/dataset/train/
+  ball_data_path: ./data/Fine-Tennis10/dataset/ball/
+  label_file: data/Fine-Tennis10/dataset/labels.txt
+  split: train
+  data_type: j
+  debug: false
+  window_size: 64
+  p_interval:
+  - 0.5
+  - 1
+  aug_method: a123589
+  intra_p: 0.5
+  inter_p: 0.2
+  thres: 64
+  uniform: true
+  partition: false
+  dataset: h36m17
+  ball_jitter_std: 0.01
+  ball_drop_prob: 0.2
+  ball_drop_max_ratio: 0.15
+  ball_impute_mode: linear
+  image_wh:
+  - 1920.0
+  - 1080.0
+  num_joints: 17
+test_feeder_args:
+  data_path: ./data/Fine-Tennis10/dataset/test/
+  ball_data_path: ./data/Fine-Tennis10/dataset/ball/
+  label_file: data/Fine-Tennis10/dataset/labels.txt
+  split: test
+  data_type: j
+  window_size: 64
+  p_interval:
+  - 0.95
+  thres: 64
+  uniform: true
+  partition: false
+  debug: false
+  dataset: h36m17
+  ball_jitter_std: 0.0
+  ball_drop_prob: 0.0
+  ball_drop_max_ratio: 0.0
+  ball_impute_mode: linear
+  image_wh:
+  - 1920.0
+  - 1080.0
+  num_joints: 17
+model: models.strokenet_v1.MambaSkeletonActionModel_H36M17_
+model_args:
+  in_channels: 3
+  embed_dim: 192
+  stage_dims:
+  - 192
+  - 256
+  - 384
+  - 512
+  num_classes: 10
+  d_state: 128
+  d_conv: 4
+  expand: 1
+  mlp_ratio: 2.0
+  drop: 0.1
+  attn_drop: 0.05
+  bimamba_type: v2
+  headdim: 48
+  headdim_256: 32
+  headdim_384: 48
+  headdim_512: 64
+  rmsnorm: true
+  downsample_strides:
+  - 1
+  - 2
+  - 2
+  - 2
+  ball_input_dim: 7
+  ball_tcn_depth: 3
+  ball_tcn_drop: 0.2
+  ball_dw_separable: true
+  fusion_layers: 2
+  attn_dim: 160
+  fusion_local_window: 8
+  mid_fusion_stage: 1
+  fusion_bridge_stages:
+  - 1
+  - 2
+  fusion_bridge_scale: 0.5
+  fusion_bridge_drop: 0.1
+  share_weights: true
+  share_weights_per_stage:
+  - true
+  - true
+  - true
+  - true
+  mlp_ratio_per_stage:
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.5
+  expand_per_stage:
+  - 1
+  - 1
+  - 1
+  - 1
+optimizer: AdamW
+weight_decay: 0.08
+lr_scheduler: cosine
+base_lr: 3e-4
+min_lr: 1e-6
+warmup_lr: 1e-8
+warmup_prefix: false
+warm_up_epoch: 25
+device:
+- 0
+batch_size: 128
+test_batch_size: 128
+num_epoch: 300
+nesterov: true
+grad_clip: true
+grad_max: 1.0
+loss_type: LSCE
+ema: true
+ema_decay: 0.999
+ema_use_for_eval: true
+center_loss: true
+center_loss_weight: 0.03
+center_alpha: 0.3
+center_feat_norm: false
+eval_interval_epoch: 1
+best_metric: top1
+save_optimizer: false
+keep_top_k: 1
+eval_tta_clips: 1
+eval_tta_time_reverse: false
+vis_feature: feats
+show_topk:
+- 1
+- 2
+- 5

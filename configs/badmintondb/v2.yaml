@@ -1,0 +1,127 @@
+base_lr: 3e-4
+batch_size: 64
+best_metric: macro_f1
+center_alpha: 0.3
+center_feat_norm: false
+center_loss: true
+center_loss_weight: 0.03
+class_weight_beta: 0.999
+device:
+- 0
+early_stop_patience: 200
+ema: true
+ema_decay: 0.99
+ema_use_for_eval: true
+feeder: feeders.badmintondb.Feeder
+grad_clip: true
+grad_max: 1.0
+loss_type: LSCE
+lr_scheduler: cosine
+min_lr: 1e-6
+model: models.badminton.strokenet_v2_interaction.StrokeNet2D_M2_Interact_
+model_args:
+  ball_input_dim: 7
+  ball_tcn_depth: 3
+  ball_tcn_drop: 0.2
+  bimamba_type: v2
+  cross_modal_dim: 64
+  d_conv: 4
+  d_state: 128
+  downsample_strides:
+  - 1
+  - 2
+  - 2
+  - 2
+  drop: 0.1
+  embed_dim: 192
+  expand: 1
+  expand_per_stage:
+  - 1
+  - 1
+  - 1
+  - 1
+  headdim: 48
+  headdim_256: 32
+  headdim_384: 48
+  headdim_512: 64
+  in_channels: 4
+  interact_d_inter: 256
+  interact_mode: attn
+  interact_n_heads: 4
+  interact_n_layers: 2
+  interact_use_ball_token: true
+  interact_use_cls: true
+  kendall_transform_type: none
+  mlp_ratio: 2.0
+  mlp_ratio_per_stage:
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.5
+  num_classes: 18
+  num_joints: 17
+  rmsnorm: true
+  share_weights: true
+  share_weights_per_stage:
+  - true
+  - true
+  - true
+  - true
+  stage_dims:
+  - 192
+  - 256
+  - 384
+  - 512
+  use_player_id_embedding: true
+  window_size: 72
+nesterov: true
+num_epoch: 400
+num_worker: 2
+optimizer: AdamW
+phase: train
+seed: 1
+show_topk:
+- 1
+- 2
+save_optimizer: true
+test_batch_size: 64
+test_feeder_args:
+  aug_method: ''
+  balance_oversample: false
+  ball_drop_max_ratio: 0.0
+  ball_drop_prob: 0.0
+  ball_impute_mode: linear
+  ball_jitter_std: 0.0
+  data_path: ./data/BadmintonDB/dataset_npy
+  data_type: jb
+  debug: false
+  inter_p: 0.0
+  intra_p: 0.0
+  num_joints: 17
+  split: val
+  use_kendall: false
+  window_size: 72
+train_feeder_args:
+  aug_method: a123589
+  balance_oversample: true
+  ball_drop_max_ratio: 0.15
+  ball_drop_prob: 0.1
+  ball_impute_mode: linear
+  ball_jitter_std: 0.005
+  data_path: ./data/BadmintonDB/dataset_npy
+  data_type: jb
+  debug: false
+  inter_p: 0.1
+  intra_p: 0.5
+  num_joints: 17
+  split: train
+  use_kendall: false
+  window_size: 72
+train_use_sampler: false
+verify_ckpt: true
+visual_dir: work_dirs/badmintondb/v2/visualizations
+warm_up_epoch: 25
+warmup_lr: 1e-8
+warmup_prefix: false
+weight_decay: 0.08
+work_dir: work_dirs/badmintondb/v2
