@@ -170,7 +170,7 @@ class MHA(nn.Module):
             inference_params.seqlen_offset == 0
             or flash_attn_with_kvcache is None
         ):
-            # TODO: this only uses seqlen_offset and not lengths_per_sample.
+            # The offset uses seqlen_offset; per-sample lengths are not used here.
             kv = self._update_kv_cache(kv, inference_params)
             k, v = kv.unbind(dim=-3)
             k = torch.repeat_interleave(k, dim=2, repeats=self.num_heads // self.num_heads_kv)

@@ -1,4 +1,4 @@
-"""Run-level metrics and the original ensemble search tie-breaking rule."""
+"""Run-level metrics and the ensemble search tie-breaking rule."""
 import numpy as np
 from sklearn.metrics import confusion_matrix, f1_score
 

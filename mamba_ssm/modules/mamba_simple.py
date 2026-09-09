@@ -287,7 +287,7 @@ class Mamba(nn.Module):
             inference_params.key_value_memory_dict[self.layer_idx] = (conv_state, ssm_state)
         else:
             conv_state, ssm_state = inference_params.key_value_memory_dict[self.layer_idx]
-            # TODO: What if batch size changes between generation, and we reuse the same states?
+            # Cached inference states require a consistent batch size.
             if initialize_states:
                 conv_state.zero_()
                 ssm_state.zero_()

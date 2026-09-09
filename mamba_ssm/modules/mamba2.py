@@ -65,7 +65,7 @@ class Mamba2(nn.Module, PyTorchModelHubMixin):
         device=None,
         dtype=None,
         bimamba_type="none",
-        save_params=False, # Keep the user's original flag
+        save_params=False,
     ):
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
@@ -191,7 +191,7 @@ class Mamba2(nn.Module, PyTorchModelHubMixin):
             self.out_proj = RowParallelLinear(self.d_inner * self.world_size, self.d_model, bias=bias,
                                               process_group=self.process_group, sequence_parallel=self.sequence_parallel,
                                               **factory_kwargs)
-        # --- Initialize debug_M ---
+        # Optional sequence-interaction matrix for inspection.
         self.debug_M = None # Initialize attribute
 
     def forward(self, u, seqlen=None, seq_idx=None, cu_seqlens=None, inference_params=None):
@@ -209,7 +209,7 @@ class Mamba2(nn.Module, PyTorchModelHubMixin):
             batch_seqlen, dim = u.shape
             batch = batch_seqlen // seqlen
 
-        # --- Reset debug_M if not saving this time (Optional but good practice) ---
+        # Clear the stored matrix when inspection is disabled.
         if not self.save_params:
             self.debug_M = None
 
@@ -526,13 +526,12 @@ class Mamba2(nn.Module, PyTorchModelHubMixin):
             inference_params.key_value_memory_dict[self.layer_idx] = (conv_state, ssm_state)
         else:
             conv_state, ssm_state = inference_params.key_value_memory_dict[self.layer_idx]
-            # TODO: What if batch size changes between generation, and we reuse the same states?
+            # Cached inference states require a consistent batch size.
             if initialize_states:
                 conv_state.zero_()
                 ssm_state.zero_()
         return conv_state, ssm_state
 
-    # Add this to your Mamba2 class (from response #18, #24)
     @property
     def kernel_matrix_m(self):
         """Returns the computed approximate M matrix stored in debug_M, otherwise None."""
@@ -547,22 +546,19 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange, repeat
-import numpy as np # Keep if needed by build function
+import numpy as np
 import warnings
 
-# Assume necessary imports for causal_conv1d, mamba_ssm.ops, etc., are present
 try:
     from causal_conv1d import causal_conv1d_fn, causal_conv1d_update
 except ImportError:
     causal_conv1d_fn, causal_conv1d_update = None, None
-# ... other necessary imports ...
 from mamba_ssm.ops.triton.ssd_combined import mamba_split_conv1d_scan_combined
 from mamba_ssm.ops.triton.layernorm_gated import RMSNorm as RMSNormGated
-# ... etc ...
 
 
 # ==============================================================================
-# Simplified build_semiseparable_matrix_avg_heads function definition
+# Head-averaged state-mediated sequence-interaction matrix.
 # Assumes params['dt'] contains the FINAL delta values after bias/softplus/limit
 # ==============================================================================
 def build_semiseparable_matrix_avg_heads(
@@ -571,7 +567,7 @@ def build_semiseparable_matrix_avg_heads(
     d_state: int,
     ngroups: int,
     seq_len: int,
-    D_param: torch.Tensor | None, # Keep D_param to check if it exists, but won't use value
+    D_param: torch.Tensor | None, # The matrix excludes the D skip term.
     D_has_hdim: bool,
     headdim: int,
     sample_idx: int = 0,
@@ -581,7 +577,7 @@ def build_semiseparable_matrix_avg_heads(
     """
     Constructs an averaged (L x L) matrix representing an *approximation*
     of the STATE-MEDIATED semiseparable matrix (M') magnitude across heads.
-    This version EXCLUDES the D term contribution from the diagonal.
+    The diagonal excludes the D skip term.
 
     Approximation: Computes M'_h[t, s] = H_h[t,s] * (avg_scalar_c_ht * avg_scalar_b_hs * delta_s),
                    where H is state transition, avg_scalar_c/b are derived from C/B tensors.
@@ -637,7 +633,7 @@ def build_semiseparable_matrix_avg_heads(
             alpha_cumsum = torch.cumsum(alpha, dim=0); alpha_cumsum_padded = torch.cat([torch.tensor([0.0],device=device,dtype=torch.float32), alpha_cumsum])
             log_H_matrix = alpha_cumsum_padded[1:][:, None] - alpha_cumsum_padded[:-1][None, :]; H_matrix = torch.exp(log_H_matrix); H_matrix = torch.tril(H_matrix, diagonal=-1)
             M_h_off_diag = C_scalar_h[:, None] * H_matrix * (delta_t_h[None, :] * B_scalar_h[None, :])
-            # --- MODIFIED DIAGONAL ---
+            # Include the diagonal contribution.
             # Diagonal term M'_ii = C_i * (delta_i * B_i) approx (NO D TERM)
             M_h_diag_vals = C_scalar_h * delta_t_h * B_scalar_h
             # -------------------------

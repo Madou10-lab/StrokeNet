@@ -20,7 +20,7 @@ def main():
     mode.add_argument(
         "--search",
         action="store_true",
-        help="Original 0.001-grid search using the supplied labels; Top-1, then Macro-F1, then Top-5 tie breaking.",
+        help="0.001-grid search using the supplied labels; Top-1, then Macro-F1, then Top-5 tie breaking.",
     )
     p.add_argument("--output", required=True)
     a = p.parse_args()

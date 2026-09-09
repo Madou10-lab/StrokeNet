@@ -382,8 +382,8 @@ def _mamba_chunk_scan_combined_bwd(dout, x, dt, A, B, C, out, chunk_size, D=None
         ddt_given = ddt
     else:
         ddt_given = torch.empty_like(dt)
-    # TD: For some reason Triton (2.1.0 and 2.2.0) errors with
-    # "[CUDA]: invalid device context" (e.g. during varlne test), and cloning makes it work. Idk why.
+    # Triton 2.1.0 and 2.2.0 can report
+    # "[CUDA]: invalid device context"; cloning avoids this failure for variable-length inputs.
     dt_in = dt.clone()
     dA_cumsum, dt = _chunk_cumsum_fwd(dt_in, A, chunk_size, dt_bias=dt_bias, dt_softplus=dt_softplus,
                                       dt_limit=dt_limit)
@@ -453,10 +453,6 @@ def _mamba_chunk_scan_combined_bwd(dout, x, dt, A, B, C, out, chunk_size, D=None
     ddA += ddA_next + ddA_prev
 
     ddt_given, dA, ddt_bias = _chunk_cumsum_bwd(ddA, ddt, dt_in, A, dt_bias=dt_bias, dt_softplus=dt_softplus, dt_limit=dt_limit, ddt=ddt_given)
-
-    # These 2 lines are just to test ddt and dA being computed by old code
-    # _, dA = selective_scan_bwd(dout, x, dt, A, B, C, D=D.float(), z=z)
-    # ddt_given.copy_(ddt)
 
     return_vals = (dx, ddt_given, dA, dB_given, dC_given, dD, dz, ddt_bias, dinitial_states)
     return return_vals if not recompute_output else (*return_vals, outz)
@@ -1056,7 +1052,6 @@ class MambaSplitConv1dScanCombinedFn(torch.autograd.Function):
 
         if d_nonssm > 0:
             dout0, dout = dout.split([d_nonssm, dim], dim=-1)
-            # You may need to pass recompute_output=False here if it's an option in your _swiglu_bwd
             _swiglu_bwd(zx0, dout0, dxy=dzx0)
 
         dout = rearrange(dout, "b s (h p) -> b s h p", p=headdim)

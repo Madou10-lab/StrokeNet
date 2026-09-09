@@ -25,8 +25,6 @@ def valid_crop_resize(data_numpy, valid_frame_num, p_interval, window, thres):
         )
         bias = np.random.randint(0, valid_size - cropped_length + 1)
         data = data_numpy[:, begin + bias : begin + bias + cropped_length, :, :]
-        if data.shape[1] == 0:
-            print(cropped_length, bias, valid_size)
         c_b = begin + bias
         c_e = begin + bias + cropped_length
     data = torch.tensor(data, dtype=torch.float)
@@ -85,8 +83,6 @@ def valid_crop_uniform(data_numpy, valid_frame_num, p_interval, window, thres):
             inds = bst + offset
         inds = inds + bias
         data = data_numpy[:, inds, :, :]
-        if data.shape[1] == 0:
-            print(cropped_length, bias, valid_size)
     data = torch.tensor(data, dtype=torch.float)
     index_t = torch.tensor(inds, dtype=torch.float)
     data = data.permute(2, 3, 0, 1).contiguous().view(V * M, C, len(inds))

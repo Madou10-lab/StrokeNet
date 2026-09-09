@@ -8,9 +8,7 @@ from feeders import tools
 from typing import Dict, List, Tuple
 import torch
 import torch.nn.functional as F
-import datetime
 
-LOG_BALL_CORRECTIONS = False
 try:
     from scipy.interpolate import PchipInterpolator
 
@@ -236,14 +234,6 @@ class FeatureEngineer:
                         self.visibility[gidx] = 0.0
                         self.x[gidx] = np.nan
                         self.y[gidx] = np.nan
-                    if LOG_BALL_CORRECTIONS:
-                        try:
-                            with open("feeder_synthetic_corrections.log", "a") as lf:
-                                lf.write(
-                                    f"{datetime.datetime.now().isoformat()} - REJECTED_CORRECTION run {start + rs}-{start + re} endpoint_dist={endpoint_dist:.1f} guard_dist={guard_dist:.1f} -> marked occluded\n"
-                                )
-                        except Exception:
-                            pass
                     continue
                 for im in range(rs, re + 1):
                     gidx = start + im
@@ -261,14 +251,6 @@ class FeatureEngineer:
                     syn_y = (1.0 - alpha) * y_left + alpha * y_right
                     self.x[gidx] = syn_x
                     self.y[gidx] = syn_y
-                    if LOG_BALL_CORRECTIONS:
-                        try:
-                            with open("feeder_synthetic_corrections.log", "a") as lf:
-                                lf.write(
-                                    f"{datetime.datetime.now().isoformat()} - corrected frame {gidx} -> ({syn_x:.1f},{syn_y:.1f}) from left@{global_left}=({x_left:.1f},{y_left:.1f}) right@{global_right}=({x_right:.1f},{y_right:.1f})\n"
-                                )
-                        except Exception:
-                            pass
 
     def calculate_features(self) -> Dict[str, np.ndarray]:
         feature_dim = 6
@@ -851,14 +833,6 @@ class Feeder(Dataset):
                     vis[sp] = 1.0
                     series["features"] = feats
                     series["visibility"] = vis
-                    if LOG_BALL_CORRECTIONS:
-                        try:
-                            with open("feeder_synthetic_corrections.log", "a") as lf:
-                                lf.write(
-                                    f"{datetime.datetime.now().isoformat()} - INJECTED_SYNTHETIC_SPIKE sample={(self.sample_name[-1] if hasattr(self, 'sample_name') else 'unknown')} frame={sp} old=({old_x:.3f},{old_y:.3f}) offset=({offset[0]:.3f},{offset[1]:.3f})\n"
-                                )
-                        except Exception:
-                            pass
             except Exception as e:
                 print(f"[Warning] synthetic spike injection failed: {e}")
         target_length = self.window_size if self.window_size > 0 else len(frames)
@@ -923,33 +897,6 @@ class Feeder(Dataset):
                     df_ball.loc[drop_frames, "Visibility"] = 0.0
                     df_ball.loc[drop_frames, ["X", "Y"]] = np.nan
         return df_ball
-
-    def debug_ball_sample(self, index: int, sample_points: int = 5):
-        ball_raw = self.ball_data[index]
-        frames = ball_raw["frames"]
-        visibility = ball_raw["visibility"]
-        x = ball_raw["x"]
-        y = ball_raw["y"]
-        print(
-            f"Sample {self.sample_name[index]} | raw detections (first {sample_points}):"
-        )
-        for frame, vis, x_val, y_val in zip(
-            frames[:sample_points],
-            visibility[:sample_points],
-            x[:sample_points],
-            y[:sample_points],
-        ):
-            print(f"  frame={frame:.0f}, vis={vis:.0f}, x={x_val}, y={y_val}")
-        ball_tensor, vis_mask = self._build_ball_stream(
-            ball_raw, augment=False, index_t=None
-        )
-        print(
-            f"Processed ball tensor shape: {ball_tensor.shape}, visibility mask sum: {vis_mask.sum()}"
-        )
-        print(
-            "First timestep features:",
-            ball_tensor[:, 0] if ball_tensor.shape[1] else "N/A",
-        )
 
     def top_k(self, score, top_k):
         rank = score.argsort()

@@ -748,9 +748,6 @@ class MambaSkeletonActionModel(nn.Module):
                     target_block = stage_i.block2
                 if target_block and hasattr(target_block, "mamba"):
                     self._target_mamba_layer_ref = target_block.mamba
-                    print(
-                        f"[Debug] Target Mamba layer reference stored for Stage {i}, Layer {layer_idx_in_stage}"
-                    )
             if i < self.num_stages - 1:
                 curr_stride = (
                     self.downsample_strides[i]
@@ -774,12 +771,8 @@ class MambaSkeletonActionModel(nn.Module):
             if hasattr(self._target_mamba_layer_ref, "debug_M"):
                 return self._target_mamba_layer_ref.debug_M
             else:
-                print("Error: Target Mamba2 layer does not have 'debug_M' attribute.")
                 return None
         else:
-            print(
-                "Warning: No target Mamba layer was identified during init, cannot retrieve M matrix."
-            )
             return None
 
     def forward(

@@ -310,12 +310,12 @@ def _chunk_scan_fwd_kernel_wip(
 
         tl.store(out_ptrs, acc, mask=(offs_m[:, None] < chunk_size_limit - start_m) & (offs_n[None, :] < hdim))
 
-        # TODO: this is not correct, and quite a bit slower
+        # This continuation branch has a known correctness/performance limitation.
         if start_m + BLOCK_SIZE_M < chunk_size_limit:
             # B = tl.load(B_ptrs, mask=(offs_m[None, :] < chunk_size_limit - start_m) & (offs_k_dstate[:, None] < dstate), other=0.0).to(tl.float32)
             B = tl.load(B_ptrs, mask=(offs_m[None, :] < chunk_size_limit - start_m) & (offs_k_dstate[:, None] < dstate), other=0.0)
             dA_cs_last = tl.load(dA_cumsum_ptr + (start_m + BLOCK_SIZE_M) * stride_dA_cs_csize).to(tl.float32)
-            # TODO: seq_idx
+            # Sequence-boundary indices are not applied in this continuation branch.
             scale = tl.exp((dA_cs_last - dA_cs_m)) * dt_m
             # B *= scale
             B = B.to(x_ptr.dtype.element_ty)
@@ -672,7 +672,7 @@ def _chunk_scan_bwd_dx_kernel(
     dA_cs_m = tl.load(dA_cumsum_ptr + offs_m * stride_dA_cs_csize, mask=offs_m < chunk_size_limit, other=0.0).to(tl.float32)
 
     acc = tl.zeros((BLOCK_SIZE_M, BLOCK_SIZE_N), dtype=tl.float32)
-    # Idk why limiting K_MAX gives wrong results, is it a Triton bug?
+    # Do not limit K_MAX: truncation produces incorrect results in this kernel.
     # K_MAX = min((pid_m + 1) * BLOCK_SIZE_M, chunk_size_limit)
     K_MAX = chunk_size_limit
     for k in range(0, K_MAX, BLOCK_SIZE_K):

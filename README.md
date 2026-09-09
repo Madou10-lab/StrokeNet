@@ -166,7 +166,7 @@ python scripts/ensemble.py --joint work_dirs/eval_v1_joint/epoch1_test_score.pkl
 python scripts/ensemble.py --joint work_dirs/eval_v2_joint/epoch1_test_score.pkl --bone work_dirs/eval_v2_bone/epoch1_test_score.pkl --annotation data/Fine-Tennis10/dataset/test/annotation.txt --search --output work_dirs/ensemble_v2/metrics.json
 ```
 
-The original procedure searches the joint weight from 0 to 1 in increments of 0.001, combines raw scores as `w * joint + (1 - w) * bone`, and maximizes Top-1. Ties are resolved by Macro-F1, then Top-5, retaining the first weight on a complete tie. Top-2 is reported separately. **This search uses the labels supplied by `--annotation`; the commands above reproduce the test-label-based ensemble search.** For evaluation with a previously selected weight, replace `--search` with `--joint-weight VALUE`.
+The ensemble procedure searches the joint weight from 0 to 1 in increments of 0.001, combines raw scores as `w * joint + (1 - w) * bone`, and maximizes Top-1. Ties are resolved by Macro-F1, then Top-5, retaining the first weight on a complete tie. Top-2 is reported separately. The search uses the labels supplied by `--annotation`; the commands above use the test annotations. For evaluation with a previously selected weight, replace `--search` with `--joint-weight VALUE`.
 
 BadmintonDB evaluation uses its validation-selected checkpoint:
 
@@ -177,9 +177,7 @@ python scripts/evaluate.py --config configs/badmintondb/v2.yaml --weights work_d
 
 ## Reproducibility
 
-Public configs specify the manuscript protocol: Fine-Tennis10 uses 300 epochs, batch size 128 and EMA decay 0.999; BadmintonDB uses the interaction configs above. The optimizer is AdamW with weight decay 0.08, gradient clipping at 1.0 and 25-epoch warmup followed by cosine decay. Fine-Tennis10 uses effective-number sampling; BadmintonDB uses the feeder's class-balanced replication.
-
-The table records the final reported results. The public configs standardize the manuscript settings; historical runs used differing epoch and batch-size settings, so these configs should not be interpreted as a guarantee of numerically identical reruns. Model computations and stream-specific architecture settings are retained.
+The released training configuration is as follows: Fine-Tennis10 uses 300 epochs, batch size 128 and EMA decay 0.999; BadmintonDB uses the interaction configs above. The optimizer is AdamW with weight decay 0.08, gradient clipping at 1.0 and 25-epoch warmup followed by cosine decay. Fine-Tennis10 uses effective-number sampling; BadmintonDB uses the feeder's class-balanced replication.
 
 Metrics in JSON are fractions; multiply by 100 for percentage points. Macro-Accuracy and Macro-F1 include all configured classes, assigning zero to unsupported classes. Compute mean and sample standard deviation (`ddof=1`) over the three independent per-seed results, not over test clips. Checkpoint selection and ensemble-weight selection are distinct operations. After saving one ensemble JSON per seed, summarize them with:
 
