@@ -1,6 +1,6 @@
 # StrokeNet: Accepted in WACV 2027
 
-Skeleton–ball modeling for fine-grained racket-sport action recognition.
+Structured State Space Duality for Pose-based Stroke Recognition in Racket Sports.
 
 [Architecture](#architecture) · [Results](#results) · [Installation](#installation) · [Training](#training) · [Evaluation](#evaluation) · [Citation](#citation)
 
