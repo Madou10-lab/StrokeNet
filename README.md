@@ -1,10 +1,10 @@
-# StrokeNet
+# StrokeNet: Accepted in WACV 2027
 
 Skeleton–ball modeling for fine-grained racket-sport action recognition.
 
 [Architecture](#architecture) · [Results](#results) · [Installation](#installation) · [Training](#training) · [Evaluation](#evaluation) · [Citation](#citation)
 
-**Fine-Tennis10 will be made publicly available upon acceptance of the paper.**
+**Fine-Tennis10 will be made publicly available upon publication.**
 
 ## Overview
 
