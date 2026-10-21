@@ -4,7 +4,10 @@ Structured State Space Duality for Pose-based Stroke Recognition in Racket Sport
 
 [Architecture](#architecture) · [Results](#results) · [Installation](#installation) · [Training](#training) · [Evaluation](#evaluation) · [Citation](#citation)
 
-**Fine-Tennis10 will be made publicly available upon publication.**
+**Fine-Tennis10**
+You can download the datasets used in this project directly from Hugging Face:
+https://huggingface.co/datasets/madou-ai/Fine-Tennis10
+https://huggingface.co/datasets/madou-ai/Fine-Tennis10-RGB
 
 ## Overview
 
