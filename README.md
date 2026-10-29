@@ -64,7 +64,7 @@ R/P/B: RGB / pose / ball. M-Acc is the mean class recall; M-F1 is the unweighted
 | StrokeNet-v1 (Ours) | Yes | No | 63.85 ± 0.58 |
 | StrokeNet-v2 (Ours) | Yes | No | 62.91 ± 1.63 |
 
-SP/PP: shuttle position / player court position. * TSkel-Mamba was evaluated by us. The StrokeNet rows use the two-player interaction adaptations, StrokeNet-v1-I and StrokeNet-v2-I.
+SP/PP: shuttle position / player court position. Baseline values are published results collected in [BST](https://github.com/Va6lue/BST-Badminton-Stroke-type-Transformer). * TSkel-Mamba was evaluated by us. The StrokeNet rows use the two-player interaction adaptations, StrokeNet-v1-I and StrokeNet-v2-I.
 
 [Full LaTeX table](docs/results/main_results.tex) · [Machine-readable values](docs/results/main_results.json)
 
