@@ -149,7 +149,7 @@ python scripts/train.py --config configs/badmintondb/v2.yaml --seed 1 --work-dir
 
 The benchmark contains 6,120 training, 757 validation and 781 test clips. Each clip contains two COCO-17 players and a shuttle trajectory. Nine stroke types are assigned to top or bottom player; flick serves are merged into serves. Joint and bone coordinates are concatenated as input channels in this adaptation. A shared per-player encoder and interaction Transformer preserve player order; court-position inputs are not used.
 
-Training uses the validation split for **Macro-F1 checkpoint selection**, a maximum of 400 epochs and early-stopping patience of 200 epochs. Evaluation switches to the held-out test split. Repeat over three seeds for the reported run-level statistics.
+Training uses the validation split for **Macro-F1 checkpoint selection**, a maximum of 1600 epochs and early-stopping patience of 300 epochs. Evaluation switches to the held-out test split. Repeat over three seeds for the reported run-level statistics.
 
 ## Evaluation
 
