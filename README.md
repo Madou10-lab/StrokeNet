@@ -188,7 +188,8 @@ Metrics in JSON are fractions; multiply by 100 for percentage points. Macro-Accu
 python scripts/summarize.py work_dirs/ensemble_v1_seed1/metrics.json work_dirs/ensemble_v1_seed2/metrics.json work_dirs/ensemble_v1_seed3/metrics.json
 ```
 
-No pretrained checkpoint is bundled with this release.
+## Pretrained checkpoints
+https://drive.google.com/drive/folders/1-nDKh0gXYt3-ee3dbd-gCp5ojQa4Mt_b?usp=sharing
 
 ## Acknowledgments
 
