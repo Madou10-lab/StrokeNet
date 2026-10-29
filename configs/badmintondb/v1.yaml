@@ -83,7 +83,7 @@ model_args:
   - 512
   use_player_id_embedding: true
 nesterov: true
-num_epoch: 400
+num_epoch: 1600
 num_worker: 2
 optimizer: AdamW
 phase: train
