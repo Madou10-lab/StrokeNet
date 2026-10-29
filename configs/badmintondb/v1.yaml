@@ -8,7 +8,7 @@ center_loss_weight: 0.03
 class_weight_beta: 0.999
 device:
 - 0
-early_stop_patience: 200
+early_stop_patience: 300
 ema: true
 ema_decay: 0.99
 ema_use_for_eval: true
