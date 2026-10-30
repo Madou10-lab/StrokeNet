@@ -120,8 +120,8 @@ warmup_prefix: false
 warm_up_epoch: 25
 device:
 - 0
-batch_size: 128
-test_batch_size: 128
+batch_size: 64
+test_batch_size: 64
 num_epoch: 300
 nesterov: true
 grad_clip: true
