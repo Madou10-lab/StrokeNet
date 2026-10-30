@@ -180,7 +180,7 @@ python scripts/evaluate.py --config configs/badmintondb/v2.yaml --weights work_d
 
 ## Reproducibility
 
-The released training configuration is as follows: Fine-Tennis10 uses 300 epochs, batch size 128 and EMA decay 0.999; BadmintonDB uses the interaction configs above. The optimizer is AdamW with weight decay 0.08, gradient clipping at 1.0 and 25-epoch warmup followed by cosine decay. Fine-Tennis10 uses effective-number sampling; BadmintonDB uses the feeder's class-balanced replication.
+The released training configuration is as follows: Fine-Tennis10 uses 300 epochs, batch size 64 and EMA decay 0.999; BadmintonDB uses the interaction configs above. The optimizer is AdamW with weight decay 0.08, gradient clipping at 1.0 and 25-epoch warmup followed by cosine decay. Fine-Tennis10 uses effective-number sampling; BadmintonDB uses the feeder's class-balanced replication.
 
 Metrics in JSON are fractions; multiply by 100 for percentage points. Macro-Accuracy and Macro-F1 include all configured classes, assigning zero to unsupported classes. Compute mean and sample standard deviation (`ddof=1`) over the three independent per-seed results, not over test clips. Checkpoint selection and ensemble-weight selection are distinct operations. After saving one ensemble JSON per seed, summarize them with:
 
